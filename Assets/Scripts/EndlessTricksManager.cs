@@ -11,7 +11,6 @@ public class EndlessTricksManager : MonoBehaviour
     //1 = lista "tricks"
     //2 = lista "backupTricks"
     private int wichList = 1;
-
     private List<EndlessTricks> tricks = new List<EndlessTricks>();
     private List<EndlessTricks> backupTricks = new List<EndlessTricks>();
     
@@ -20,30 +19,60 @@ public class EndlessTricksManager : MonoBehaviour
     //1 = "Family Friendly"
     private int category = 0;
     private System.Random random = new System.Random();
-
-    public Text trickText;
     private readonly string textFilePath = "/TricksText/EndlessTricks.txt";
-    
+
+    //Caixas de texto
+    public GameObject trickBox;
+    public GameObject turnBox;
+    //Butões
+    public GameObject giveUpButton;
+    public GameObject getTrickButton;
+    public GameObject otherTrickButton;
+    public GameObject nextPlayerButton;
+
     // Start is called before the first frame update
     void Start()
     {
         LoadTricks();
     }
 
-    public void GetTrick()
+    //Metodo para fazer a caixa de turno desaparecer
+    IEnumerator FadeOutTurnBox()
+    {
+        for (float f = 1f; f >= -0.05f; f -= 0.05f)
+        {
+            turnBox.GetComponent<CanvasGroup>().alpha = f;
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        //Desativar Caixa de turno
+        turnBox.SetActive(false);
+    }
+
+    //Metodo para fazer a caixa de prendas aparecer
+    IEnumerator FadeInTrickBox()
+    {
+        for (float f = 0f; f <= 1.05f; f += 0.05f)
+        {
+            trickBox.GetComponent<CanvasGroup>().alpha = f;
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
+
+    public void ChangeTrick()
     {
         if (wichList == 1)
         {
             //Pega um numero aleatório e atualiza o texto no meio da tela
             int num = random.Next(tricks.Count);
-            trickText.text = tricks[num].text[category];
+            trickBox.GetComponentInChildren<Text>().text = tricks[num].text[category];
 
             //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
             backupTricks.Add(tricks[num]);
             tricks.RemoveAt(num);
-            
+
             //Caso a lista fique vazio mudar a variavel do wichList para 2
-            if(tricks.Count == 0)
+            if (tricks.Count == 0)
             {
                 wichList = 2;
             }
@@ -52,7 +81,7 @@ public class EndlessTricksManager : MonoBehaviour
         {
             //Pega um numero aleatório e atualiza o texto no meio da tela
             int num = random.Next(backupTricks.Count);
-            trickText.text = backupTricks[num].text[category];
+            trickBox.GetComponentInChildren<Text>().text = backupTricks[num].text[category];
 
             //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
             tricks.Add(backupTricks[num]);
@@ -64,8 +93,23 @@ public class EndlessTricksManager : MonoBehaviour
                 wichList = 1;
             }
         }
+    }
 
-        //Atualizar lista de Players
+    public void GetTrick()
+    {
+        StartCoroutine(FadeOutTurnBox());
+
+        //Ativar o trickbox
+        trickBox.SetActive(true);
+        //Pegar uma prenda e colocar no texto
+        ChangeTrick();
+
+        StartCoroutine(FadeInTrickBox());
+
+        giveUpButton.SetActive(false);
+        getTrickButton.SetActive(false);
+        otherTrickButton.SetActive(true);
+        nextPlayerButton.SetActive(true);
     }
 
     private void LoadTricks()

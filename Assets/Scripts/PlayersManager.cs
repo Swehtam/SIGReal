@@ -10,13 +10,16 @@ public class PlayersManager : MonoBehaviour
     private List<PlayersInfo> playerList = new List<PlayersInfo>();
     //Contador de players, máximo 10 (a referência de no máximo 10 está na função AddPlayer);
     private int playersCount = 0;
+    
     public int PlayersCount
     {
         get { return playersCount; }
     }
 
+    public GameObject playerPrefab;
+    public Transform playerListTransform;
     public InputField nameInput;
-    public Text playersListText;
+    public RectTransform movableComponents;
 
     private void Start()
     {
@@ -30,9 +33,22 @@ public class PlayersManager : MonoBehaviour
             if (playersCount < 10)
             {
                 playerList.Add(new PlayersInfo(nameInput.text));
-                playersListText.text += nameInput.text + ";\n";
+                GameObject player = Instantiate(playerPrefab, playerListTransform);
+                player.GetComponentInChildren<Text>().text = nameInput.text;
+                if(PlayersCount != 0)
+                {
+                    player.transform.localPosition = new Vector3(playerList[PlayersCount-1].x, playerList[PlayersCount-1].y - 200);
+                }
+                playerList[playersCount].x = player.transform.localPosition.x;
+                playerList[playersCount].y = player.transform.localPosition.y;
+
                 playersCount++;
                 nameInput.text = "";
+
+                if(PlayersCount > 5)
+                {
+                    movableComponents.sizeDelta = new Vector2(1080, 1920 + ((PlayersCount - 5) * 200));
+                }
             }
             else
             {
@@ -52,7 +68,7 @@ public class PlayersManager : MonoBehaviour
 
     public void NextScene()
     {
-        if(playersCount > 0)
+        if(playersCount > 1)
         {
             SceneManager.LoadScene("EndlessMode", LoadSceneMode.Single);
         }
