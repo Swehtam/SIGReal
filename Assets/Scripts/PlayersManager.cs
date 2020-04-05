@@ -8,9 +8,14 @@ public class PlayersManager : MonoBehaviour
 {
     //Lista para salvar todos os players cadastrados na partida
     private List<PlayersInfo> playerList = new List<PlayersInfo>();
+    private List<PlayersInfo> backUpList = new List<PlayersInfo>();
     //Contador de players, máximo 10 (a referência de no máximo 10 está na função AddPlayer);
     private int playersCount = 0;
-    
+    //Script com o modo e a categoria
+    private GameSettingsManager gameSettingsManager;
+    private int category;
+    private string mode;
+
     public int PlayersCount
     {
         get { return playersCount; }
@@ -24,6 +29,9 @@ public class PlayersManager : MonoBehaviour
     private void Start()
     {
         DontDestroyOnLoad(transform.gameObject);
+        gameSettingsManager = GameObject.Find("GameSettingsController").GetComponent<GameSettingsManager>();
+        category = gameSettingsManager.GetCategory();
+        mode = gameSettingsManager.GetMode();
     }
 
     public void AddPlayer()
@@ -42,6 +50,8 @@ public class PlayersManager : MonoBehaviour
                 playerList[playersCount].x = player.transform.localPosition.x;
                 playerList[playersCount].y = player.transform.localPosition.y;
 
+
+                backUpList.Add(playerList[playersCount]);
                 playersCount++;
                 nameInput.text = "";
 
@@ -70,13 +80,30 @@ public class PlayersManager : MonoBehaviour
     {
         if(playersCount > 1)
         {
-            SceneManager.LoadScene("EndlessMode", LoadSceneMode.Single);
+            //Lembrar de checar qual o modo que o player vai jogar e também a categoria
+            SceneManager.LoadScene(mode, LoadSceneMode.Single);
         }
         else
         {
             //Colocar mensagem de que tem adicionar players para jogar
         }
         
+    }
+
+    public void RefillPlayerList()
+    {
+        foreach(PlayersInfo player in backUpList)
+        {
+            playerList.Add(player);
+        }
+
+        playersCount = backUpList.Count;
+    }
+
+    public void BackButton()
+    {
+        gameSettingsManager.GoBackScene("CategorysScene");
+        Destroy(gameObject);
     }
 }
 

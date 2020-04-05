@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 public class EndlessTricksManager : MonoBehaviour
 {
@@ -24,11 +25,6 @@ public class EndlessTricksManager : MonoBehaviour
     //Caixas de texto
     public GameObject trickBox;
     public GameObject turnBox;
-    //Butões
-    public GameObject giveUpButton;
-    public GameObject getTrickButton;
-    public GameObject otherTrickButton;
-    public GameObject nextPlayerButton;
 
     // Start is called before the first frame update
     void Start()
@@ -36,29 +32,25 @@ public class EndlessTricksManager : MonoBehaviour
         LoadTricks();
     }
 
-    //Metodo para fazer a caixa de turno desaparecer
-    IEnumerator FadeOutTurnBox()
+    private void LoadTricks()
     {
-        for (float f = 1f; f >= -0.05f; f -= 0.05f)
+        if (File.Exists(Application.dataPath + textFilePath))
         {
-            turnBox.GetComponent<CanvasGroup>().alpha = f;
-            yield return new WaitForSeconds(0.05f);
-        }
+            //Ler o arquivo usando StreamReader. Ler o arquivo linha por linha
+            using (StreamReader file = new StreamReader(Application.dataPath + textFilePath))
+            {
+                string ln;
 
-        //Desativar Caixa de turno
-        turnBox.SetActive(false);
-    }
-
-    //Metodo para fazer a caixa de prendas aparecer
-    IEnumerator FadeInTrickBox()
-    {
-        for (float f = 0f; f <= 1.05f; f += 0.05f)
-        {
-            trickBox.GetComponent<CanvasGroup>().alpha = f;
-            yield return new WaitForSeconds(0.05f);
+                while ((ln = file.ReadLine()) != null)
+                {
+                    string[] phrases = ln.Split(';');
+                    tricks.Add(new EndlessTricks(phrases[0], phrases[1]));
+                }
+                file.Close();
+            }
         }
     }
-
+    
     public void ChangeTrick()
     {
         if (wichList == 1)
@@ -105,29 +97,39 @@ public class EndlessTricksManager : MonoBehaviour
         ChangeTrick();
 
         StartCoroutine(FadeInTrickBox());
-
-        giveUpButton.SetActive(false);
-        getTrickButton.SetActive(false);
-        otherTrickButton.SetActive(true);
-        nextPlayerButton.SetActive(true);
     }
 
-    private void LoadTricks()
+    public void InitialScene()
     {
-        if (File.Exists(Application.dataPath + textFilePath))
-        {
-            //Ler o arquivo usando StreamReader. Ler o arquivo linha por linha
-            using (StreamReader file = new StreamReader(Application.dataPath + textFilePath))
-            {
-                string ln;
+        SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+    }
 
-                while ((ln = file.ReadLine()) != null)
-                {
-                    string[] phrases = ln.Split(';');
-                    tricks.Add(new EndlessTricks(phrases[0], phrases[1]));
-                }
-                file.Close();
-            }
+    public void RestartMode()
+    {
+        //Lembrar de colocar categorias dos modos
+        SceneManager.LoadScene("EndlessMode", LoadSceneMode.Single);
+    }
+
+    //Metodo para fazer a caixa de turno desaparecer
+    IEnumerator FadeOutTurnBox()
+    {
+        for (float f = 1f; f >= -0.05f; f -= 0.05f)
+        {
+            turnBox.GetComponent<CanvasGroup>().alpha = f;
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        //Desativar Caixa de turno
+        turnBox.SetActive(false);
+    }
+
+    //Metodo para fazer a caixa de prendas aparecer
+    IEnumerator FadeInTrickBox()
+    {
+        for (float f = 0f; f <= 1.05f; f += 0.05f)
+        {
+            trickBox.GetComponent<CanvasGroup>().alpha = f;
+            yield return new WaitForSeconds(0.05f);
         }
     }
 }

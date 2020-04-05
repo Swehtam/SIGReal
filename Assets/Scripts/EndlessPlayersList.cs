@@ -17,18 +17,15 @@ public class EndlessPlayersList : MonoBehaviour
     private bool firstPlayerRemoved = false;
     private bool playersMoved = false;
     private bool playerGiveUp = false;
+    private bool endGame = false;
 
     //Variaveis para instaciar um player na lista de players
     public GameObject playerPrefab;
-    public Transform canvasTransform;
+    public Transform playersListTransform;
     //Caixas de texto
     public GameObject trickBox;
     public GameObject turnBox;
-    //Butões
-    public GameObject giveUpButton;
-    public GameObject getTrickButton;
-    public GameObject otherTrickButton;
-    public GameObject nextPlayerButton;
+    public GameObject winBox;
 
     //Deve ser Awake para criar a lista de players antes que outro script precise utilizar da lista
     void Awake()
@@ -73,15 +70,14 @@ public class EndlessPlayersList : MonoBehaviour
             playersCount++;
         }
 
-        //Destruir objeto com a lista antiga
-        Destroy(playerController);
+        aux.RefillPlayerList();
     }
 
     //Metodo para instaciar players quando mudar para a tela do modo, este metodo é chamado pelo metodo "RandomizeList"
     public void InstantiatePlayer(float separator, float i, int screenWidth, int playerWidth)
     {
         //Instaciar o objeto na tela dentro do canvas e separar um do outro
-        GameObject player = Instantiate(playerPrefab, canvasTransform);
+        GameObject player = Instantiate(playerPrefab, playersListTransform);
         player.GetComponentInChildren<Text>().text = playerList[playersCount].name;
         if (i == 0)
         {
@@ -98,26 +94,54 @@ public class EndlessPlayersList : MonoBehaviour
         playerList[playersCount].player = player;
     }
 
-    //Metodo para fazer com que o primeiro player suma
-    IEnumerator FadeOutFirstPlayer()
+    private void LoadFirstPlayer()
     {
-        for (float f = 1f; f >= -0.05f; f -= 0.05f)
-        {
-            playerList[0].player.GetComponent<CanvasGroup>().alpha = f;
-            yield return new WaitForSeconds(0.05f);
-        }
+        turnBox.GetComponentInChildren<Text>().text = playerList[0].name + "!!\nSua vez";
+    }
 
-        //Caso ele nao tenha desistido coloca-lo no final da lista
+    public void ChangePlayerTurn()
+    {
         if (!playerGiveUp)
         {
-            playerList.Add(playerList[0]);
+            StartCoroutine(MovePlayers());
+            StartCoroutine(FadeOutFirstPlayer());
+            StartCoroutine(FadeOutTrickBox());
+
+            //Ativar Caixa de turno
+            turnBox.SetActive(true);
+            turnBox.GetComponentInChildren<Text>().text = playerList[1].name + "!!\nSua vez";
+            StartCoroutine(FadeInTurnBox());
         }
-        else
+    }
+
+    //Metodo caso o player desista, variavel tem que ser verdadeira para nao adicionar o player no final da lista e tratar sua posição
+    public void PlayerGiveUp()
+    {
+        if(!playerGiveUp)
         {
-            playersCount--;
+            if (playersCount > 2)
+            {
+                StartCoroutine(MovePlayers());
+                playerGiveUp = true;
+                StartCoroutine(FadeOutFirstPlayer());
+                turnBox.GetComponentInChildren<Text>().text = playerList[1].name + "!!\nSua vez";
+            }
+            else if (playersCount == 2)
+            {
+                //Desaparece a caixa de turno
+                StartCoroutine(FadeOutTurnBox());
+                //Pega o vencedor e mostra na caixa de vencedor
+                winBox.SetActive(true);
+                StartCoroutine(FadeInWinBox());
+                winBox.GetComponentInChildren<Text>().text = "Parabéns!!\n" + playerList[1].name + " venceu";
+                //Move o vencedor para o centro (player 2)
+                StartCoroutine(MoveWinner());
+                //Remove o primeiro o mestre
+                playerGiveUp = true;
+                endGame = true;
+                StartCoroutine(FadeOutFirstPlayer());
+            }
         }
-        playerList.RemoveAt(0);
-        firstPlayerRemoved = true;
     }
 
     //Move todos os players para a esquerda, 
@@ -132,7 +156,7 @@ public class EndlessPlayersList : MonoBehaviour
             {
                 if (i != 0)
                 {
-                    player.player.transform.localPosition = Vector3.Lerp(new Vector3(player.x, player.y), new Vector3(player.x - playerSeparator - playerWidth, player.y), t*1.5f);
+                    player.player.transform.localPosition = Vector3.Lerp(new Vector3(player.x, player.y), new Vector3(player.x - playerSeparator - playerWidth, player.y), t*2f);
                     t += Time.deltaTime;
                     yield return null;
                 }
@@ -141,6 +165,18 @@ public class EndlessPlayersList : MonoBehaviour
         }
 
         playersMoved = true;
+    }
+
+    //Move o vencedor para o meio da tela
+    IEnumerator MoveWinner()
+    {
+        float t = 0f;
+        while (t < 1f)
+        {
+            playerList[1].player.transform.localPosition = Vector3.Lerp(new Vector3(playerList[1].x, playerList[1].y), new Vector3(0, playerList[1].y), t * 1.5f);
+            t += Time.deltaTime;
+            yield return null;
+        }
     }
 
     //Metodo para fazer com que o ultimo player apareça
@@ -162,6 +198,39 @@ public class EndlessPlayersList : MonoBehaviour
         }
     }
 
+    //Aparece a caixa com o vencedor
+    IEnumerator FadeInWinBox()
+    {
+        for (float f = 0f; f <= 1.05f; f += 0.05f)
+        {
+            winBox.GetComponent<CanvasGroup>().alpha = f;
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
+
+    //Metodo para fazer com que o primeiro player suma
+    IEnumerator FadeOutFirstPlayer()
+    {
+        for (float f = 1f; f >= -0.05f; f -= 0.05f)
+        {
+            playerList[0].player.GetComponent<CanvasGroup>().alpha = f;
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        if (endGame != true)
+        {
+            firstPlayerRemoved = true;
+        }
+        else
+        {
+            Destroy(playerList[0].player);
+            playersCount--;
+            playerList.RemoveAt(0);
+            playerGiveUp = false;
+        }
+        
+    }
+
     IEnumerator FadeOutTrickBox()
     {
         for (float f = 1f; f >= -0.05f; f -= 0.05f)
@@ -174,46 +243,37 @@ public class EndlessPlayersList : MonoBehaviour
         trickBox.SetActive(false);
     }
 
-    public void ChangePlayerTurn()
+    //Metodo para fazer a caixa de turno desaparecer
+    IEnumerator FadeOutTurnBox()
     {
-        StartCoroutine(FadeOutFirstPlayer());
-        StartCoroutine(MovePlayers());
-        StartCoroutine(FadeOutTrickBox());
-
-        //Ativar Caixa de turno
-        turnBox.SetActive(true);
-        turnBox.GetComponentInChildren<Text>().text = playerList[1].name + "!!\nSua vez";
-        StartCoroutine(FadeInTurnBox());
-
-        giveUpButton.SetActive(true);
-        getTrickButton.SetActive(true);
-        otherTrickButton.SetActive(false);
-        nextPlayerButton.SetActive(false);
-    }
-
-    //Metodo caso o player desista, variavel tem que ser verdadeira para nao adicionar o player no final da lista e tratar sua posição
-    public void PlayerGiveUp()
-    {
-        if(playersCount != 1)
+        for (float f = 1f; f >= -0.05f; f -= 0.05f)
         {
-            playerGiveUp = true;
-            StartCoroutine(FadeOutFirstPlayer());
-            StartCoroutine(MovePlayers());
-            turnBox.GetComponentInChildren<Text>().text = playerList[1].name + "!!\nSua vez";
+            turnBox.GetComponent<CanvasGroup>().alpha = f;
+            yield return new WaitForSeconds(0.05f);
         }
-    }
 
-    private void LoadFirstPlayer()
-    {
-        turnBox.GetComponentInChildren<Text>().text = playerList[0].name + "!!\nSua vez";
+        //Desativar Caixa de turno
+        turnBox.SetActive(false);
     }
-
+    
     // Update is called once per frame
     void Update()
     {
         //Caso ja tenha terminado as Coroutinas "FadeOutFirstPlayer" e "MovePlayers"
         if (firstPlayerRemoved == true && playersMoved == true)
         {
+            //Caso ele nao tenha desistido coloca-lo no final da lista
+            if (!playerGiveUp)
+            {
+                playerList.Add(playerList[0]);
+            }
+            else
+            {
+                Destroy(playerList[0].player);
+                playersCount--;
+            }
+            playerList.RemoveAt(0);
+
             //Caso não tenha desistido, colocar o antigo primeiro da lista na posição do antigo ultimo da lista
             if (!playerGiveUp)
             {
@@ -224,7 +284,7 @@ public class EndlessPlayersList : MonoBehaviour
             for (int i = 0; i < playersCount; i++)
             {
                 //Atualizar todos os players da lista caso o mestre tenha desistido ou atualiza até o penultimo caso contrario, pois o ultimo (antigo primeiro) ja foi atualizado
-                if (i != playersCount - 1 || playerGiveUp) 
+                if (i != playersCount - 1 || playerGiveUp)
                 {
                     playerList[i].x = playerList[i].x - playerSeparator - playerWidth;
                 }
