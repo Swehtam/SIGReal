@@ -61,7 +61,7 @@ public class AddPlayersManager : MonoBehaviour
                 if (color != null)
                 {
                     //Adiciona os players na lista do Script gerenciador
-                    playersManager.AddPlayer(nameInput.text, color);
+                    playersManager.AddPlayer(nameInput.text, color, true);
                     //Cria um objeto na Scene de AddPlayers, muda sua posição, sua imagem e seu texto
                     GameObject player = Instantiate(playerPrefab, playerListTransform);
                     player.GetComponentInChildren<Text>().text = nameInput.text;

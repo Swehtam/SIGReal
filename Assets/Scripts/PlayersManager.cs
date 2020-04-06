@@ -29,9 +29,9 @@ public class PlayersManager : MonoBehaviour
     }
 
     //Adicionar players na lista, chamado pelo script AddPlayersManager
-    public void AddPlayer(string name, string color)
+    public void AddPlayer(string name, string color, bool healthStatus)
     {
-        PlayerList.Add(new PlayersInfo(name, color));
+        PlayerList.Add(new PlayersInfo(name, color, healthStatus));
         backUpList.Add(PlayerList[PlayersCount]);
     }
 
@@ -72,6 +72,7 @@ public class PlayersManager : MonoBehaviour
 public class PlayersInfo
 {
     public string name;
+    public bool healthStatus;
     public float x;
     public float y;
     public GameObject player;
@@ -87,5 +88,12 @@ public class PlayersInfo
     {
         this.name = name;
         this.color = color;
+    }
+
+    public PlayersInfo(string name, string color, bool healthStatus)
+    {
+        this.name = name;
+        this.color = color;
+        this.healthStatus = healthStatus;
     }
 }
