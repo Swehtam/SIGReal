@@ -102,6 +102,8 @@ public class EndlessTricksManager : MonoBehaviour
     public void InitialScene()
     {
         SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
+        Destroy(GameObject.Find("GameSettingsController"));
+        Destroy(GameObject.Find("PlayersController"));
     }
 
     public void RestartMode()

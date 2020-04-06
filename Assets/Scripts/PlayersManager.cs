@@ -3,107 +3,69 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 public class PlayersManager : MonoBehaviour
 {
-    //Lista para salvar todos os players cadastrados na partida
-    private List<PlayersInfo> playerList = new List<PlayersInfo>();
-    private List<PlayersInfo> backUpList = new List<PlayersInfo>();
-    //Contador de players, máximo 10 (a referência de no máximo 10 está na função AddPlayer);
-    private int playersCount = 0;
-    //Script com o modo e a categoria
     private GameSettingsManager gameSettingsManager;
+    //Lista reserva para quando for reinicar o modo
+    private List<PlayersInfo> backUpList = new List<PlayersInfo>();
     private int category;
-    private string mode;
 
-    public int PlayersCount
-    {
-        get { return playersCount; }
-    }
-
-    public GameObject playerPrefab;
-    public Transform playerListTransform;
-    public InputField nameInput;
-    public RectTransform movableComponents;
-
-    private void Start()
+    //Lista para salvar todos os players cadastrados na partida
+    public List<PlayersInfo> PlayerList { get; private set; } = new List<PlayersInfo>();
+    //Script com o modo e a categoria
+    
+    public string Mode { get; private set; }
+    //Contador de players, máximo 10 (a referência de no máximo 10 está na função AddPlayer);
+    public int PlayersCount { get; private set; } = 0;
+    
+    void Start()
     {
         DontDestroyOnLoad(transform.gameObject);
         gameSettingsManager = GameObject.Find("GameSettingsController").GetComponent<GameSettingsManager>();
         category = gameSettingsManager.GetCategory();
-        mode = gameSettingsManager.GetMode();
+        Mode = gameSettingsManager.GetMode();
     }
 
-    public void AddPlayer()
+    //Adicionar players na lista, chamado pelo script AddPlayersManager
+    public void AddPlayer(string name, string color)
     {
-        if (!string.IsNullOrWhiteSpace(nameInput.text))
-        {
-            if (playersCount < 10)
-            {
-                playerList.Add(new PlayersInfo(nameInput.text));
-                GameObject player = Instantiate(playerPrefab, playerListTransform);
-                player.GetComponentInChildren<Text>().text = nameInput.text;
-                if(PlayersCount != 0)
-                {
-                    player.transform.localPosition = new Vector3(playerList[PlayersCount-1].x, playerList[PlayersCount-1].y - 200);
-                }
-                playerList[playersCount].x = player.transform.localPosition.x;
-                playerList[playersCount].y = player.transform.localPosition.y;
-
-
-                backUpList.Add(playerList[playersCount]);
-                playersCount++;
-                nameInput.text = "";
-
-                if(PlayersCount > 5)
-                {
-                    movableComponents.sizeDelta = new Vector2(1080, 1920 + ((PlayersCount - 5) * 200));
-                }
-            }
-            else
-            {
-                //Colocar um aviso de que o número máximo de Players é de 10
-                Debug.Log("full bitch");
-            }
-        }
+        PlayerList.Add(new PlayersInfo(name, color));
+        backUpList.Add(PlayerList[PlayersCount]);
     }
 
+    //Mudar o x e y do player na lista, chamado pelo script AddPlayersManager
+    public void SetXY(float x, float y)
+    {
+        PlayerList[PlayersCount].x = x;
+        PlayerList[PlayersCount].y = y;
+    }
+
+    //Incrementar o contador, chamado pelo script AddPlayersManager
+    public void IncrementCounter()
+    {
+        PlayersCount++;
+    }
+
+    //Retornar um player para adicionar na lista do script do modo e remover deste script para nao ocorrer repetição de player, chamado pelos scripts EndlessPlayersList e ChallengerPlayersList
     public PlayersInfo GetPlayer(int number)
     {
-        PlayersInfo player = playerList[number];
-        playerList.RemoveAt(number);
-        playersCount--;
+        PlayersInfo player = PlayerList[number];
+        PlayerList.RemoveAt(number);
+        PlayersCount--;
         return player;
     }
 
-    public void NextScene()
-    {
-        if(playersCount > 1)
-        {
-            //Lembrar de checar qual o modo que o player vai jogar e também a categoria
-            SceneManager.LoadScene(mode, LoadSceneMode.Single);
-        }
-        else
-        {
-            //Colocar mensagem de que tem adicionar players para jogar
-        }
-        
-    }
-
+    //Colocar no playersList todos os players salvos no bakcup para poder reiniciar o jogo, chamado pelos scripts EndlessTricksManager e ChallengerTricksManager
     public void RefillPlayerList()
     {
         foreach(PlayersInfo player in backUpList)
         {
-            playerList.Add(player);
+            PlayerList.Add(player);
         }
 
-        playersCount = backUpList.Count;
-    }
-
-    public void BackButton()
-    {
-        gameSettingsManager.GoBackScene("CategorysScene");
-        Destroy(gameObject);
+        PlayersCount = backUpList.Count;
     }
 }
 
@@ -113,18 +75,17 @@ public class PlayersInfo
     public float x;
     public float y;
     public GameObject player;
-
-    //Cor do jogador, ainda nao é importante
-    //private Color color;
+    //Cor do jogador
+    public string color;
 
     public PlayersInfo(string name)
     {
         this.name = name;
     }
 
-    /*public PlayersInfo(string name, Color color)
+    public PlayersInfo(string name, string color)
     {
         this.name = name;
         this.color = color;
-    }*/
+    }
 }

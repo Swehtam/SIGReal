@@ -179,7 +179,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.38431373, g: 0.45490196, b: 0.5137255, a: 0.50980395}
+    m_NormalColor: {r: 0.34901962, g: 0.24313726, b: 0.33333334, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.50863296, g: 0.68275964, b: 0.8490566, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -539,7 +539,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.55682623, g: 0.89463264, b: 0.9150943, a: 0.50980395}
+    m_NormalColor: {r: 0.55682623, g: 0.89463264, b: 0.9150943, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.50863296, g: 0.68275964, b: 0.8490566, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -905,7 +905,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.55682623, g: 0.89463264, b: 0.9150943, a: 0.50980395}
+    m_NormalColor: {r: 0.55682623, g: 0.89463264, b: 0.9150943, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.50863296, g: 0.68275964, b: 0.8490566, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -1113,7 +1113,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.55682623, g: 0.89463264, b: 0.9150943, a: 0.50980395}
+    m_NormalColor: {r: 0.55682623, g: 0.89463264, b: 0.9150943, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.50863296, g: 0.68275964, b: 0.8490566, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -1248,7 +1248,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.55682623, g: 0.89463264, b: 0.9150943, a: 0.50980395}
+    m_NormalColor: {r: 0.5686275, g: 0.65882355, b: 0.59607846, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.50863296, g: 0.68275964, b: 0.8490566, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -1528,7 +1528,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.38431373, g: 0.45490196, b: 0.5137255, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -1776,6 +1776,27 @@ MonoBehaviour:
   trickBox: {fileID: 1115639464}
   turnBox: {fileID: 1330474746}
   winBox: {fileID: 1012390033}
+  playersColor:
+  - colorName: amarelo
+    image: {fileID: 21300000, guid: e6f99c9d96dea0b43bc130eebe0d5389, type: 3}
+  - colorName: azul
+    image: {fileID: 21300000, guid: 94b6585a3f7dda543a2883bd54ac23d1, type: 3}
+  - colorName: branco
+    image: {fileID: 21300000, guid: 91d88541ea2231640bdb45700c67bc92, type: 3}
+  - colorName: cinza
+    image: {fileID: 21300000, guid: ff5517506db75724090b2ce7ab811f2d, type: 3}
+  - colorName: laranja
+    image: {fileID: 21300000, guid: 57c35dad7f96c8044b3c0620ae895b27, type: 3}
+  - colorName: preto
+    image: {fileID: 21300000, guid: 6ed0ef4e0d7b7404ba47bd45a3154f5e, type: 3}
+  - colorName: rosa
+    image: {fileID: 21300000, guid: 6a676f293f894ae489ba7ac8abb4f7c9, type: 3}
+  - colorName: roxo
+    image: {fileID: 21300000, guid: cb35ee9df50d73147bfc3c27b972bfc1, type: 3}
+  - colorName: verde
+    image: {fileID: 21300000, guid: 04f083ab8b653fa47b3f2384aeca8fab, type: 3}
+  - colorName: vermelho
+    image: {fileID: 21300000, guid: 5343ae3fba4b373449860520c3b02079, type: 3}
 --- !u!1 &1330474746
 GameObject:
   m_ObjectHideFlags: 0
@@ -2296,7 +2317,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.9137255, g: 0.58823055, b: 0.5568628, a: 0.50980395}
+    m_NormalColor: {r: 0.9137255, g: 0.58823055, b: 0.5568628, a: 1}
     m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
     m_PressedColor: {r: 0.50863296, g: 0.68275964, b: 0.8490566, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}

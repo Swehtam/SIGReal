@@ -27,6 +27,15 @@ public class EndlessPlayersList : MonoBehaviour
     public GameObject turnBox;
     public GameObject winBox;
 
+    [Serializable]
+    public struct PlayerColor
+    {
+        public String colorName;
+        public Sprite image;
+    }
+
+    public PlayerColor[] playersColor;
+
     //Deve ser Awake para criar a lista de players antes que outro script precise utilizar da lista
     void Awake()
     {
@@ -88,6 +97,15 @@ public class EndlessPlayersList : MonoBehaviour
         {
             //Pega a posição do x do player anterior e adiciona o separador + o tamanho de um player
             player.transform.localPosition = player.transform.localPosition + new Vector3(playerList[playersCount - 1].x + separator + playerWidth, 0);
+        }
+        //Muda a imagem do player e desativa seu botão para outro player nao escolher
+        foreach (PlayerColor pColor in playersColor)
+        {
+            if (pColor.colorName.Equals(playerList[playersCount].color))
+            {
+                player.GetComponentInChildren<Image>().sprite = pColor.image;
+                break;
+            }
         }
         playerList[playersCount].x = player.transform.localPosition.x;
         playerList[playersCount].y = player.transform.localPosition.y;
