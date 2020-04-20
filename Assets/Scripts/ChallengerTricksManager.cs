@@ -16,32 +16,37 @@ public class ChallengerTricksManager : MonoBehaviour
     private List<ChallengerTricks> phase3Tricks = new List<ChallengerTricks>();
     private List<ChallengerTricks> phase3BackupTricks = new List<ChallengerTricks>();
     private ChallengerPlayersList challengerPlayersList;
-    public int phase { get; private set; } = 1;
-    private int action;
-    
-    //Essa variavel determina qual categoria é, essa variavel tem que ser atualizada por um script de configurações
-    //0 = "Drinking Game"
-    //1 = "Family Friendly"
-    private int category = 0;
+    private GameSettingsManager gameSettingsManager;
+    public int Phase { get; private set; } = 1;
+    public int Action { get; private set; }
+    public int FirstPlayerTrickDoneCounter { get; private set; } = 0;
+
     private System.Random random = new System.Random();
     private readonly string textFilePath = "/TricksText/ChallengerTricks.txt";
+
+    //Objeto que mostra quantas vezes o player completou os desafios
+    public GameObject tricksDoneCounter;
     
     //Caixas de texto
     public GameObject trickBox;
     public GameObject turnBox;
     public GameObject choosePlayerBox;
+    public GameObject phaseBox;
 
     //Butões
     public GameObject nextPlayerButton;
     public GameObject trickDoneButton;
     public GameObject trickNotDoneButton;
     public GameObject choosePlayerButton;
+    public GameObject getTrickButton;
+    public GameObject continueButton;
 
     // Start is called before the first frame update
     void Start()
     {
         LoadTricks();
         challengerPlayersList = gameObject.GetComponent<ChallengerPlayersList>();
+        gameSettingsManager = GameObject.Find("GameSettingsController").GetComponent<GameSettingsManager>();
     }
 
     //Metodo para carregar o arquivo .txt com os tricks do challenger
@@ -69,8 +74,7 @@ public class ChallengerTricksManager : MonoBehaviour
                     else
                     {
                         phase3Tricks.Add(new ChallengerTricks(phrases[0], phrases[1], int.Parse(phrases[2])));
-                    }
-                    
+                    } 
                 }
                 file.Close();
             }
@@ -79,16 +83,15 @@ public class ChallengerTricksManager : MonoBehaviour
 
     private void CheckTrickAction()
     {
-        ChallengerTricks trick;
-        if (phase == 1)
+        if (Phase == 1)
         {
             if (phase1Tricks.Count != 0)
             {
                 //Pega um numero aleatório e atualiza o texto no meio da tela
                 int num = random.Next(phase1Tricks.Count);
-                trickBox.GetComponentInChildren<Text>().text = phase1Tricks[num].text[category];
+                trickBox.GetComponentInChildren<Text>().text = phase1Tricks[num].text[gameSettingsManager.GetCategory()];
 
-                trick = phase1Tricks[num];
+                Action = phase1Tricks[num].action;
 
                 //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
                 phase1BackupTricks.Add(phase1Tricks[num]);
@@ -98,48 +101,106 @@ public class ChallengerTricksManager : MonoBehaviour
             {
                 //Pega um numero aleatório e atualiza o texto no meio da tela
                 int num = random.Next(phase1BackupTricks.Count);
-                trickBox.GetComponentInChildren<Text>().text = phase1BackupTricks[num].text[category];
+                trickBox.GetComponentInChildren<Text>().text = phase1BackupTricks[num].text[gameSettingsManager.GetCategory()];
 
-                trick = phase1Tricks[num];
+                Action = phase1BackupTricks[num].action;
 
                 //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
                 phase1Tricks.Add(phase1BackupTricks[num]);
                 phase1BackupTricks.RemoveAt(num);
             }
-
-            if(trick.action == 0)
-            {
-                trickDoneButton.SetActive(true);
-                trickNotDoneButton.SetActive(true);
-            }
-            else if(trick.action == 1)
-            {
-                challengerPlayersList.InfectMaster();
-                nextPlayerButton.SetActive(true);
-            }
-            else if (trick.action == 2)
-            {
-                action = 2;
-                choosePlayerButton.SetActive(true);
-            }
+            
         }
-        else if (phase == 2)
+        else if (Phase == 2)
         {
+            if (phase2Tricks.Count != 0)
+            {
+                //Pega um numero aleatório e atualiza o texto no meio da tela
+                int num = random.Next(phase2Tricks.Count);
+                trickBox.GetComponentInChildren<Text>().text = phase2Tricks[num].text[gameSettingsManager.GetCategory()];
 
+                Action = phase2Tricks[num].action;
+
+                //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
+                phase2BackupTricks.Add(phase2Tricks[num]);
+                phase2Tricks.RemoveAt(num);
+            }
+            else
+            {
+                //Pega um numero aleatório e atualiza o texto no meio da tela
+                int num = random.Next(phase2BackupTricks.Count);
+                trickBox.GetComponentInChildren<Text>().text = phase2BackupTricks[num].text[gameSettingsManager.GetCategory()];
+
+                Action = phase2BackupTricks[num].action;
+
+                //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
+                phase2Tricks.Add(phase2BackupTricks[num]);
+                phase2BackupTricks.RemoveAt(num);
+            }
         }
         else
         {
+            tricksDoneCounter.SetActive(true);
+            if (phase3Tricks.Count != 0)
+            {
+                //Pega um numero aleatório e atualiza o texto no meio da tela
+                int num = random.Next(phase3Tricks.Count);
+                trickBox.GetComponentInChildren<Text>().text = phase3Tricks[num].text[gameSettingsManager.GetCategory()];
 
+                Action = phase3Tricks[num].action;
+
+                //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
+                phase3BackupTricks.Add(phase3Tricks[num]);
+                phase3Tricks.RemoveAt(num);
+            }
+            else
+            {
+                //Pega um numero aleatório e atualiza o texto no meio da tela
+                int num = random.Next(phase3BackupTricks.Count);
+                trickBox.GetComponentInChildren<Text>().text = phase3BackupTricks[num].text[gameSettingsManager.GetCategory()];
+
+                Action = phase3BackupTricks[num].action;
+
+                //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
+                phase3Tricks.Add(phase3BackupTricks[num]);
+                phase3BackupTricks.RemoveAt(num);
+            }
         }
-    }
 
-    private void NextPayer()
-    {
-        challengerPlayersList.ChangePlayerTurn();
+        if (Action == 0)
+        {
+            trickDoneButton.SetActive(true);
+            trickNotDoneButton.SetActive(true);
+        }
+        else if (Action == 1)
+        {
+            nextPlayerButton.SetActive(true);
+        }
+        else if (Action == 2)
+        {
+            choosePlayerButton.SetActive(true);
+        }
+        else if(Action == 3 || Action == 4)
+        {
+            if(challengerPlayersList.SickPlayersCount == 0)
+            {
+                CheckTrickAction();
+            }
+            else
+            {
+                choosePlayerButton.SetActive(true);
+            }
+        }
+        else if (Action == 8)
+        {
+            trickDoneButton.SetActive(true);
+            trickNotDoneButton.SetActive(true);
+        }
     }
 
     public void GetTrick()
     {
+        //Desaparece a caixa de turno
         StartCoroutine(FadeOutTurnBox());
 
         //Ativar o trickbox
@@ -150,6 +211,46 @@ public class ChallengerTricksManager : MonoBehaviour
         StartCoroutine(FadeInTrickBox());
     }
 
+    private void NextPlayer()
+    {
+        challengerPlayersList.ChangePlayerTurn();
+    }
+
+    //Juntas todas as bases de dados aleatoriamente no phase2BackUpTrick
+    private void JoinPhase1And2Tricks()
+    {
+        System.Random random = new System.Random();
+        int total = phase1Tricks.Count;
+
+        //Pega todos os tricks da phase1 aleatoriamente
+        for(int i = 0; i < total; i++)
+        {
+            int num = random.Next(phase1Tricks.Count);
+            phase2BackupTricks.Add(phase1Tricks[num]);
+            phase1Tricks.RemoveAt(num);
+        }
+
+        total = phase1BackupTricks.Count;
+
+        //Pega todos os tricks da phase1 aleatoriamente
+        for (int i = 0; i < total; i++)
+        {
+            int num = random.Next(phase1BackupTricks.Count);
+            phase2BackupTricks.Add(phase1BackupTricks[num]);
+            phase1BackupTricks.RemoveAt(num);
+        }
+
+        total = phase2Tricks.Count;
+
+        //Pega todos os tricks da phase1 aleatoriamente
+        for (int i = 0; i < total; i++)
+        {
+            int num = random.Next(phase2Tricks.Count);
+            phase2BackupTricks.Add(phase2Tricks[num]);
+            phase2Tricks.RemoveAt(num);
+        }
+    }
+    
     public void InitialScene()
     {
         SceneManager.LoadScene("MainScene", LoadSceneMode.Single);
@@ -159,30 +260,81 @@ public class ChallengerTricksManager : MonoBehaviour
 
     public void RestartMode()
     {
+        challengerPlayersList.CurePlayers();
         //Lembrar de colocar categorias dos modos
         SceneManager.LoadScene("ChallengerMode", LoadSceneMode.Single);
     }
 
     public void NextPlayerButton()
     {
-        NextPayer();
+        NextPlayer();
         nextPlayerButton.SetActive(false);
+
+        if(Action == 1)
+        {
+            challengerPlayersList.InfectMaster();
+        }
     }
 
     public void TrickDoneOrNotButton(bool done)
     {
-        if (!done)
+        if(Action == 0)
         {
-            challengerPlayersList.InfectMaster();
+            if (!done)
+            {
+                challengerPlayersList.InfectMaster();
+            }
+            else
+            {
+                challengerPlayersList.CureMaster();
+            }
+            NextPlayer();
+            trickDoneButton.SetActive(false);
+            trickNotDoneButton.SetActive(false);
         }
-        else
+        else if (Action == 4)
         {
-            challengerPlayersList.CureMaster();
-        }
+            GameObject selectedPlayer = FindObjectOfType<ChoosePlayer>().gameObject;
+            foreach (Text textComponent in selectedPlayer.GetComponentsInChildren<Text>())
+            {
+                if (textComponent.name.Equals("Cor"))
+                {
+                    if (!done)
+                    {
+                        challengerPlayersList.InfectPlayerByColor(textComponent.text);
+                    }
+                    else
+                    {
+                        challengerPlayersList.CurePlayerByColor(textComponent.text);
+                    }
+                }
+            }
 
-        NextPayer();
-        trickDoneButton.SetActive(false);
-        trickNotDoneButton.SetActive(false);
+            StartCoroutine(FadeOutChoosePlayerBox());
+            Destroy(selectedPlayer);
+            NextPlayer();
+            trickDoneButton.SetActive(false);
+            trickNotDoneButton.SetActive(false);
+        }
+        else if (Action == 8)
+        {
+            if (!done)
+            {
+                FirstPlayerTrickDoneCounter = 0;
+                tricksDoneCounter.GetComponentInChildren<Text>().text = "" + FirstPlayerTrickDoneCounter;
+                challengerPlayersList.InfectMaster();
+                NextPlayer();
+                tricksDoneCounter.SetActive(false);
+                trickDoneButton.SetActive(false);
+                trickNotDoneButton.SetActive(false);
+            }
+            else
+            {
+                FirstPlayerTrickDoneCounter++;
+                tricksDoneCounter.GetComponentInChildren<Text>().text = "" + FirstPlayerTrickDoneCounter;
+                CheckTrickAction();
+            }
+        }
     }
 
     public void ChoosePlayerButton()
@@ -192,11 +344,23 @@ public class ChallengerTricksManager : MonoBehaviour
         StartCoroutine(FadeInChoosePlayerBox());
         StartCoroutine(FadeOutTrickBox());
 
-        if (action == 2)
+        if (Action == 2)
         {
             //Pega a lista de players que não estão infectados e passar para o metodo de instaciar esses botões na tela
             challengerPlayersList.InstantiatePlayersHealth(challengerPlayersList.GetSpecificPlayers(true));
             choosePlayerBox.GetComponentInChildren<Text>().text = "Infecte um jogador";
+        }
+        else if(Action == 3)
+        {
+            //Pega a lista de players que estão infectados e passar para o metodo de instaciar esses botões na tela
+            challengerPlayersList.InstantiatePlayersHealth(challengerPlayersList.GetSpecificPlayers(false));
+            choosePlayerBox.GetComponentInChildren<Text>().text = "Cure um jogador";
+        }
+        else if (Action == 4)
+        {
+            //Pega a lista de players que estão infectados e passar para o metodo de instaciar esses botões na tela
+            challengerPlayersList.InstantiatePlayersHealth(challengerPlayersList.GetSpecificPlayers(false));
+            choosePlayerBox.GetComponentInChildren<Text>().text = "Selecione um Jogador";
         }
     }
     
@@ -211,6 +375,7 @@ public class ChallengerTricksManager : MonoBehaviour
             challengerPlayersList.CurePlayerByColor(color);
         }
 
+        trickBox.SetActive(false);
         StartCoroutine(FadeOutChoosePlayerBox());
 
         foreach(ChoosePlayer aux in FindObjectsOfType<ChoosePlayer>())
@@ -218,12 +383,46 @@ public class ChallengerTricksManager : MonoBehaviour
             Destroy(aux.gameObject);
         }
 
-        NextPayer();
+        NextPlayer();
+    }
+
+    public void GoToNextPhase(int phaseValue)
+    {
+        //Desaparece a caixa de turno
+        StartCoroutine(FadeOutTurnBox());
+
+        Phase = phaseValue;
+        phaseBox.SetActive(true);
+        phaseBox.GetComponentInChildren<Text>().text = "Fase " + Phase;
+        StartCoroutine(FadeInPhaseBox());
+
+        if(Phase == 2)
+        {
+            JoinPhase1And2Tricks();
+        }
+    }
+
+    //Metodo para saber se o player infectado ou não fez a prenda
+    public void ShowTrickDoneOrNotButtons(string color)
+    {
+        //Destroi todos os players que estão na caixa de seleção
+        foreach (ChoosePlayer aux in FindObjectsOfType<ChoosePlayer>())
+        {
+            Destroy(aux.gameObject);
+        }
+
+        //Ativa os botãos para dizer que o player selecionado fez ou não a prenda
+        trickDoneButton.SetActive(true);
+        trickNotDoneButton.SetActive(true);
+
+        choosePlayerBox.GetComponentInChildren<Text>().text = "Jogador selecionado";
+        challengerPlayersList.InstantiateSelectedPlayer(color);
     }
 
     //Metodo para fazer a caixa de turno desaparecer
     IEnumerator FadeOutTurnBox()
     {
+        getTrickButton.GetComponent<Button>().interactable = false;
         for (float f = 1f; f >= -0.05f; f -= 0.05f)
         {
             turnBox.GetComponent<CanvasGroup>().alpha = f;
@@ -237,6 +436,11 @@ public class ChallengerTricksManager : MonoBehaviour
     //Metodo para fazer a caixa de prendas desaparecer
     IEnumerator FadeOutTrickBox()
     {
+        nextPlayerButton.GetComponent<Button>().interactable = false;
+        trickDoneButton.GetComponent<Button>().interactable = false;
+        trickNotDoneButton.GetComponent<Button>().interactable = false;
+        choosePlayerButton.GetComponent<Button>().interactable = false;
+
         for (float f = 1f; f >= -0.05f; f -= 0.05f)
         {
             trickBox.GetComponent<CanvasGroup>().alpha = f;
@@ -268,6 +472,11 @@ public class ChallengerTricksManager : MonoBehaviour
             trickBox.GetComponent<CanvasGroup>().alpha = f;
             yield return new WaitForSeconds(0.05f);
         }
+
+        nextPlayerButton.GetComponent<Button>().interactable = true;
+        trickDoneButton.GetComponent<Button>().interactable = true;
+        trickNotDoneButton.GetComponent<Button>().interactable = true;
+        choosePlayerButton.GetComponent<Button>().interactable = true;
     }
 
     //Metodo para fazer a caixa de selecionar jogador aparecer
@@ -278,6 +487,18 @@ public class ChallengerTricksManager : MonoBehaviour
             choosePlayerBox.GetComponent<CanvasGroup>().alpha = f;
             yield return new WaitForSeconds(0.05f);
         }
+    }
+
+    //Metodo para fazer a caixa de fase aparecer
+    IEnumerator FadeInPhaseBox()
+    {
+        for (float f = 0f; f <= 1.05f; f += 0.05f)
+        {
+            phaseBox.GetComponent<CanvasGroup>().alpha = f;
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        continueButton.GetComponent<Button>().interactable = true;
     }
 }
 

@@ -14,11 +14,8 @@ public class EndlessTricksManager : MonoBehaviour
     private int wichList = 1;
     private List<EndlessTricks> tricks = new List<EndlessTricks>();
     private List<EndlessTricks> backupTricks = new List<EndlessTricks>();
-    
-    //Essa variavel determina qual categoria é, essa variavel tem que ser atualizada por um script de configurações
-    //0 = "Drinking Game"
-    //1 = "Family Friendly"
-    private int category = 0;
+    private GameSettingsManager gameSettingsManager;
+
     private System.Random random = new System.Random();
     private readonly string textFilePath = "/TricksText/EndlessTricks.txt";
 
@@ -30,6 +27,7 @@ public class EndlessTricksManager : MonoBehaviour
     void Start()
     {
         LoadTricks();
+        gameSettingsManager = GameObject.Find("GameSettingsController").GetComponent<GameSettingsManager>();
     }
 
     private void LoadTricks()
@@ -57,7 +55,7 @@ public class EndlessTricksManager : MonoBehaviour
         {
             //Pega um numero aleatório e atualiza o texto no meio da tela
             int num = random.Next(tricks.Count);
-            trickBox.GetComponentInChildren<Text>().text = tricks[num].text[category];
+            trickBox.GetComponentInChildren<Text>().text = tricks[num].text[gameSettingsManager.GetCategory()];
 
             //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
             backupTricks.Add(tricks[num]);
@@ -73,7 +71,7 @@ public class EndlessTricksManager : MonoBehaviour
         {
             //Pega um numero aleatório e atualiza o texto no meio da tela
             int num = random.Next(backupTricks.Count);
-            trickBox.GetComponentInChildren<Text>().text = backupTricks[num].text[category];
+            trickBox.GetComponentInChildren<Text>().text = backupTricks[num].text[gameSettingsManager.GetCategory()];
 
             //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
             tricks.Add(backupTricks[num]);

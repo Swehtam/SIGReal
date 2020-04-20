@@ -8,9 +8,11 @@ public class ChoosePlayer : MonoBehaviour
 {
     private String playerColor;
     private String playerHealth;
-    
+    private ChallengerTricksManager challengerTricksManager;
+
     public void SelectPlayer()
     {
+        gameObject.GetComponent<Button>().interactable = false;
         foreach (Text textComponent in gameObject.GetComponentsInChildren<Text>())
         {
             if (textComponent.name.Equals("Cor"))
@@ -23,7 +25,18 @@ public class ChoosePlayer : MonoBehaviour
             }
         }
 
-        GameObject.Find("EventSystem").GetComponent<ChallengerTricksManager>().InfectOrCurePlayer(playerColor, playerHealth);
+        challengerTricksManager = GameObject.Find("EventSystem").GetComponent<ChallengerTricksManager>();
+        int action = challengerTricksManager.Action;
+
+        if(action == 2 || action == 3)
+        {
+            challengerTricksManager.InfectOrCurePlayer(playerColor, playerHealth);
+        }
+        else if (action == 4)
+        {
+            challengerTricksManager.ShowTrickDoneOrNotButtons(playerColor);
+        }
+        
     }
 
 }

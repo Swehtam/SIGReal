@@ -1,0 +1,5 @@
+A partir de você, conte todas as pessoas até parar no número abaixo, a pessoa agora sofre um reverse: se está infectada, curou-se! Se estava saudável, saiu da quarentena e foi infectada!;;5;2
+A pessoa dona do celular sofre reverse: se estava infectada, agora está saudável. Se estava saudável, hm kk, CORONAH VÁIRUS!;;6;2
+A pessoa infectada @pessoaInfectada agora é o coronavírus, a pessoa saudável @pessoaSaudável agora é um anticorpo, numa briga, quem ganharia? Todos votam, o ganhador escolhe um infectado para salvar, e um saudável para infectar.;;7;2
+Let the best infected win: Infectados, assim que o mestre disser já, vocês deverão correr e buscar álcool em gel, o primeiro a trazer álcool em gel para a roda curou-se! Já!;;3;2
+SCIENCE IS MAGIC THAT WORKS: Você acabou de descobrir a cura do COVID-19, mas você só pode contar pra uma pessoa, escolha alguém para curar.;;3;2

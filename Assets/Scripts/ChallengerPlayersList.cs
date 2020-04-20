@@ -8,6 +8,8 @@ public class ChallengerPlayersList : MonoBehaviour
 {
     private List<PlayersInfo> playerList = new List<PlayersInfo>();
     private int playersCount = 0;
+
+    private ChallengerTricksManager challengerTricksManager; 
     //Largura da tela
     private readonly int screenWidth = 1080;
     //Largura do icone do player
@@ -19,6 +21,10 @@ public class ChallengerPlayersList : MonoBehaviour
     //Mudar
     private bool endGame = false;
 
+    //Contadores para saber quantos saudaveis e doentes tem
+    public int HealthyPlayersCount { get; private set; } = 1;
+    public int SickPlayersCount { get; private set; } = 0;
+
     //Prefabs
     public GameObject playerPrefab;
     public Transform playersListTransform;
@@ -27,8 +33,16 @@ public class ChallengerPlayersList : MonoBehaviour
     //Caixas de texto
     public GameObject trickBox;
     public GameObject turnBox;
-    //Mudar
+    public GameObject phaseBox;
     public GameObject winBox;
+
+    //Botões
+    public GameObject nextPlayerButton;
+    public GameObject trickDoneButton;
+    public GameObject trickNotDoneButton;
+    public GameObject choosePlayerButton;
+    public GameObject getTrickButton;
+    public GameObject continueButton;
 
     [Serializable]
     public struct PlayerColor
@@ -45,6 +59,105 @@ public class ChallengerPlayersList : MonoBehaviour
     {
         RandomizeList();
         LoadFirstPlayer();
+    }
+
+    void Start()
+    {
+        challengerTricksManager = gameObject.GetComponent<ChallengerTricksManager>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        //Caso ja tenha terminado as Coroutinas "FadeOutFirstPlayer" e "MovePlayers"
+        if (firstPlayerRemoved == true && playersMoved == true)
+        {
+            playerList.Add(playerList[0]);
+            playerList.RemoveAt(0);
+
+            //colocar o antigo primeiro da lista na posição do antigo ultimo da lista
+            playerList[playersCount - 1].player.transform.localPosition = new Vector3(playerList[playersCount - 2].x, playerList[playersCount - 2].y);
+            playerList[playersCount - 1].x = playerList[playersCount - 2].x;
+            for (int i = 0; i < playersCount; i++)
+            {
+                //Atualizar todos os players da lista caso o mestre tenha desistido ou atualiza até o penultimo caso contrario, pois o ultimo (antigo primeiro) ja foi atualizado
+                if (i != playersCount - 1)
+                {
+                    playerList[i].x = playerList[i].x - playerSeparator - playerWidth;
+                }
+            }
+
+            firstPlayerRemoved = false;
+            playersMoved = false;
+
+            //Aparecer ultimo player
+            StartCoroutine(FadeInLastPlayer());
+
+            //Checagem se ta na terceira fase e se o mestre atual é o player saudavel ou não
+            if (challengerTricksManager.Phase == 3 && !playerList[0].healthStatus)
+            {
+                if (HealthyPlayersCount == 1)
+                {
+                    //Se o próximo player estiver curado, chama essa função
+                    if (playerList[1].healthStatus)
+                    {
+                        ChangePlayerTurn();
+                    }
+                    else
+                    {
+                        //Vou sumir de um por um até chegar no player antecendente ao que ta curado
+                        StartCoroutine(MovePlayers());
+                        StartCoroutine(FadeOutFirstPlayer());
+                    }
+                }
+                else
+                {
+                    CureMaster();
+                }
+            }
+        }
+
+        if (challengerTricksManager.Phase == 1)
+        {
+            float percent = (float)SickPlayersCount / playersCount;
+            if (percent >= 0.5f)
+            {
+                if (playersCount != 2)
+                {
+                    //Vai para a fase dois
+                    challengerTricksManager.GoToNextPhase(2);
+                }
+                else
+                {
+                    //Vai para a fase dois
+                    challengerTricksManager.GoToNextPhase(3);
+                }
+
+            }
+        }
+        else if (challengerTricksManager.Phase == 2)
+        {
+            if (HealthyPlayersCount == 1)
+            {
+                //Vai para a fase 3
+                challengerTricksManager.GoToNextPhase(3);
+            }
+        }
+
+        if (challengerTricksManager.FirstPlayerTrickDoneCounter == 3 && endGame == false)
+        {
+            //Desaparece a caixa de turno
+            StartCoroutine(FadeOutTrickBox());
+            //Pega o vencedor e mostra na caixa de vencedor
+            winBox.SetActive(true);
+            StartCoroutine(FadeInWinBox());
+            winBox.GetComponentInChildren<Text>().text = "Parabéns!!\n" + playerList[0].name + " venceu";
+            //Move o vencedor para o centro o primeiro player
+            StartCoroutine(MoveWinner());
+            StartCoroutine(FadeOutOtherPlayers());
+            endGame = true;
+        }
+
     }
 
     //Metodo para pegar a lista de players criada no outro script e ordena-los nesta lista de forma randomica
@@ -82,6 +195,8 @@ public class ChallengerPlayersList : MonoBehaviour
             InstantiatePlayer(separator, i, screenWidth, playerWidth);
             playersCount++;
         }
+
+        HealthyPlayersCount = playersCount;
 
         aux.RefillPlayerList();
     }
@@ -121,6 +236,15 @@ public class ChallengerPlayersList : MonoBehaviour
         turnBox.GetComponentInChildren<Text>().text = playerList[0].name + "!!\nSua vez";
     }
 
+    public void CurePlayers()
+    {
+        foreach (PlayersInfo player in playerList)
+        {
+            player.healthStatus = true;
+        }
+    }
+
+    //MUDAR A VEZ DO PLAYER
     public void ChangePlayerTurn()
     {
         StartCoroutine(MovePlayers());
@@ -133,6 +257,16 @@ public class ChallengerPlayersList : MonoBehaviour
         StartCoroutine(FadeInTurnBox());
     }
 
+    public void ContinueButton()
+    {
+        StartCoroutine(FadeOutPhaseBox());
+
+        //Ativar Caixa de turno
+        turnBox.SetActive(true);
+        turnBox.GetComponentInChildren<Text>().text = playerList[0].name + "!!\nSua vez";
+        StartCoroutine(FadeInTurnBox());
+    }
+
     public bool GetMasterHealthStatus()
     {
         return playerList[0].healthStatus;
@@ -140,15 +274,24 @@ public class ChallengerPlayersList : MonoBehaviour
 
     public void InfectMaster()
     {
-        playerList[0].healthStatus = false;
-        foreach (PlayerColor pColor in playersColor)
+        //Se o mestre estiver curado
+        if (playerList[0].healthStatus)
         {
-            if (pColor.colorName.Equals(playerList[0].color))
+            playerList[0].healthStatus = false;
+            foreach (PlayerColor pColor in playersColor)
             {
-                playerList[0].player.GetComponentInChildren<Image>().sprite = pColor.sickImage;
-                break;
+                if (pColor.colorName.Equals(playerList[0].color))
+                {
+                    playerList[0].player.GetComponentInChildren<Image>().sprite = pColor.sickImage;
+                    break;
+                }
             }
+
+            //A checagem é importante para esse decremente e incremento
+            HealthyPlayersCount--;
+            SickPlayersCount++;
         }
+        
     }
 
     public void InfectPlayerByColor(string color)
@@ -164,27 +307,44 @@ public class ChallengerPlayersList : MonoBehaviour
             }
         }
 
-        foreach (PlayerColor pColor in playersColor)
+        //Se o player da cor estiver saudavel então infecte
+        if (aux.healthStatus)
         {
-            if (pColor.colorName.Equals(aux.color))
+            foreach (PlayerColor pColor in playersColor)
             {
-                playerList[0].healthStatus = false;
-                aux.player.GetComponentInChildren<Image>().sprite = pColor.sickImage;
-                break;
+                if (pColor.colorName.Equals(aux.color))
+                {
+                    aux.healthStatus = false;
+                    aux.player.GetComponentInChildren<Image>().sprite = pColor.sickImage;
+                    break;
+                }
             }
+
+            //A checagem é importante para esse decremente e incremento
+            HealthyPlayersCount--;
+            SickPlayersCount++;
         }
+        
     }
 
     public void CureMaster()
     {
-        playerList[0].healthStatus = true;
-        foreach (PlayerColor pColor in playersColor)
+        //Se o player estiver infectado então cure
+        if (!playerList[0].healthStatus)
         {
-            if (pColor.colorName.Equals(playerList[0].color))
+            playerList[0].healthStatus = true;
+            foreach (PlayerColor pColor in playersColor)
             {
-                playerList[0].player.GetComponentInChildren<Image>().sprite = pColor.healthyImage;
-                break;
+                if (pColor.colorName.Equals(playerList[0].color))
+                {
+                    playerList[0].player.GetComponentInChildren<Image>().sprite = pColor.healthyImage;
+                    break;
+                }
             }
+
+            //A checagem é importante para esse decremente e incremento
+            HealthyPlayersCount++;
+            SickPlayersCount--;
         }
     }
 
@@ -201,22 +361,30 @@ public class ChallengerPlayersList : MonoBehaviour
             }
         }
 
-        foreach (PlayerColor pColor in playersColor)
+        //Se o player da cor selecionada estiver infectado então cure
+        if (!aux.healthStatus)
         {
-            if (pColor.colorName.Equals(aux.color))
+            foreach (PlayerColor pColor in playersColor)
             {
-                playerList[0].healthStatus = true;
-                aux.player.GetComponentInChildren<Image>().sprite = pColor.healthyImage;
-                break;
+                if (pColor.colorName.Equals(aux.color))
+                {
+                    aux.healthStatus = true;
+                    aux.player.GetComponentInChildren<Image>().sprite = pColor.healthyImage;
+                    break;
+                }
             }
+
+            //A checagem é importante para esse decremente e incremento
+            HealthyPlayersCount++;
+            SickPlayersCount--;
         }
+
     }
 
     //Método para filtrar apenas players em uma única condição de saúde
     public List<PlayersInfo> GetSpecificPlayers(bool healthStatus)
     {
         List<PlayersInfo> specificPlayers = new List<PlayersInfo>();
-
 
         foreach (PlayersInfo player in playerList)
         {
@@ -230,9 +398,9 @@ public class ChallengerPlayersList : MonoBehaviour
         return specificPlayers;
     }
 
-    public void InstantiatePlayersHealth(List<PlayersInfo> playersList)
+    public void InstantiatePlayersHealth(List<PlayersInfo> playersListAux)
     {
-        for (int i = 0; i < playersList.Count; i++)
+        for (int i = 0; i < playersListAux.Count; i++)
         {
             //Instaciar o objeto na tela dentro do canvas e separar um do outro
             GameObject player = Instantiate(pickPlayerPrefab, choosePlayerBoxTransform);
@@ -242,16 +410,16 @@ public class ChallengerPlayersList : MonoBehaviour
                 //Salvar o nome e a cor no botão
                 if(textComponent.gameObject.name.Equals("Nome"))
                 {
-                    textComponent.text = playersList[i].name;
+                    textComponent.text = playersListAux[i].name;
                 }
                 else if(textComponent.gameObject.name.Equals("Cor"))
                 {
                     //Isso daqui vai ser útil para quando for chamar o metodo do botão, ai ele pega a cor salva em si, busca na lista de players essa cor e muda para infectado ou curado
-                    textComponent.text = playersList[i].color;
+                    textComponent.text = playersListAux[i].color;
                 }
                 else
                 {
-                    if (playersList[i].healthStatus)
+                    if (playersListAux[i].healthStatus)
                     {
                         textComponent.text = "Saudável";
                     }
@@ -271,16 +439,16 @@ public class ChallengerPlayersList : MonoBehaviour
             if (i % 2 == 1)
             {
                 //Para cada i de valor impar colocar o player do lado direito da tela adicionado 300 no x
-                player.transform.localPosition = player.transform.localPosition + new Vector3(+300, 0);
+                player.transform.localPosition = player.transform.localPosition + new Vector3(300, 0);
             }
 
             //Muda a imagem do player e desativa seu botão para outro player nao escolher
             foreach (PlayerColor pColor in playersColor)
             {
-                if (pColor.colorName.Equals(playersList[i].color))
+                if (pColor.colorName.Equals(playersListAux[i].color))
                 {
                     //Se for saudavel
-                    if (playersList[i].healthStatus)
+                    if (playersListAux[i].healthStatus)
                     {
                         player.GetComponentInChildren<Image>().sprite = pColor.healthyImage;
                     }
@@ -294,6 +462,53 @@ public class ChallengerPlayersList : MonoBehaviour
         }
     }
 
+    public void InstantiateSelectedPlayer(string color)
+    {
+        foreach(PlayersInfo player in playerList)
+        {
+            if (player.color.Equals(color))
+            {
+                //Instaciar o objeto na tela dentro do canvas e separar um do outro
+                GameObject playerPrefab = Instantiate(pickPlayerPrefab, choosePlayerBoxTransform);
+
+                foreach (Text textComponent in playerPrefab.GetComponentsInChildren<Text>())
+                {
+                    //Salvar o nome e a cor no botão
+                    if (textComponent.gameObject.name.Equals("Nome"))
+                    {
+                        textComponent.text = player.name;
+                    }
+                    else if (textComponent.gameObject.name.Equals("Cor"))
+                    {
+                        //Isso daqui vai ser útil para quando for chamar o metodo do botão, ai ele pega a cor salva em si, busca na lista de players essa cor e muda para infectado ou curado
+                        textComponent.text = player.color;
+                    }
+                }
+
+                //Instancia o player no meio do box de selecionar players
+                playerPrefab.transform.localPosition = playerPrefab.transform.localPosition + new Vector3(0, -550);
+
+                //Muda a imagem do player e desativa seu botão para outro player nao escolher
+                foreach (PlayerColor pColor in playersColor)
+                {
+                    if (pColor.colorName.Equals(color))
+                    {
+                        //Se for saudavel
+                        if (player.healthStatus)
+                        {
+                            playerPrefab.GetComponentInChildren<Image>().sprite = pColor.healthyImage;
+                        }
+                        else //Se não for saudavel
+                        {
+                            playerPrefab.GetComponentInChildren<Image>().sprite = pColor.sickImage;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
     //Move todos os players para a esquerda, 
     //nao preciso tratar aqui caso o player desista, pois a animação termina antes de remover o player da lista
     IEnumerator MovePlayers()
@@ -323,7 +538,7 @@ public class ChallengerPlayersList : MonoBehaviour
         float t = 0f;
         while (t < 1f)
         {
-            playerList[1].player.transform.localPosition = Vector3.Lerp(new Vector3(playerList[1].x, playerList[1].y), new Vector3(0, playerList[1].y), t * 1.5f);
+            playerList[0].player.transform.localPosition = Vector3.Lerp(new Vector3(playerList[0].x, playerList[0].y), new Vector3(0, playerList[0].y), t * 1.5f);
             t += Time.deltaTime;
             yield return null;
         }
@@ -346,6 +561,7 @@ public class ChallengerPlayersList : MonoBehaviour
             turnBox.GetComponent<CanvasGroup>().alpha = f;
             yield return new WaitForSeconds(0.05f);
         }
+        getTrickButton.GetComponent<Button>().interactable = true;
     }
 
     //Aparece a caixa com o vencedor
@@ -382,12 +598,16 @@ public class ChallengerPlayersList : MonoBehaviour
 
     IEnumerator FadeOutTrickBox()
     {
+        nextPlayerButton.GetComponent<Button>().interactable = false;
+        trickDoneButton.GetComponent<Button>().interactable = false;
+        trickNotDoneButton.GetComponent<Button>().interactable = false;
+        choosePlayerButton.GetComponent<Button>().interactable = false;
+
         for (float f = 1f; f >= -0.05f; f -= 0.05f)
         {
             trickBox.GetComponent<CanvasGroup>().alpha = f;
             yield return new WaitForSeconds(0.05f);
         }
-
         //Desativar Caixa de prendas
         trickBox.SetActive(false);
     }
@@ -395,6 +615,7 @@ public class ChallengerPlayersList : MonoBehaviour
     //Metodo para fazer a caixa de turno desaparecer
     IEnumerator FadeOutTurnBox()
     {
+        getTrickButton.GetComponent<Button>().interactable = false;
         for (float f = 1f; f >= -0.05f; f -= 0.05f)
         {
             turnBox.GetComponent<CanvasGroup>().alpha = f;
@@ -405,33 +626,37 @@ public class ChallengerPlayersList : MonoBehaviour
         turnBox.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
+    IEnumerator FadeOutPhaseBox()
     {
-        //Caso ja tenha terminado as Coroutinas "FadeOutFirstPlayer" e "MovePlayers"
-        if (firstPlayerRemoved == true && playersMoved == true)
+        continueButton.GetComponent<Button>().interactable = false;
+        for (float f = 1f; f >= -0.05f; f -= 0.05f)
         {
-            
-            playerList.Add(playerList[0]);    
-            playerList.RemoveAt(0);
+            phaseBox.GetComponent<CanvasGroup>().alpha = f;
+            yield return new WaitForSeconds(0.05f);
+        }
 
-            //colocar o antigo primeiro da lista na posição do antigo ultimo da lista
-            playerList[playersCount - 1].player.transform.localPosition = new Vector3(playerList[playersCount - 2].x, playerList[playersCount - 2].y);
-            playerList[playersCount - 1].x = playerList[playersCount - 2].x;
-            for (int i = 0; i < playersCount; i++)
+        //Desativar Caixa de turno
+        phaseBox.SetActive(false);
+    }
+
+    IEnumerator FadeOutOtherPlayers()
+    {
+        int counter = 0;
+       
+        foreach(PlayersInfo player in playerList)
+        {
+            if (counter != 0)
             {
-                //Atualizar todos os players da lista caso o mestre tenha desistido ou atualiza até o penultimo caso contrario, pois o ultimo (antigo primeiro) ja foi atualizado
-                if (i != playersCount - 1)
+                for (float f = 1f; f >= -0.05f; f -= 0.2f)
                 {
-                    playerList[i].x = playerList[i].x - playerSeparator - playerWidth;
+
+                    player.player.GetComponent<CanvasGroup>().alpha = f;
+                    yield return new WaitForSeconds(0.05f);
                 }
             }
 
-            //Aparecer ultimo player
-            StartCoroutine(FadeInLastPlayer());
-        
-            firstPlayerRemoved = false;
-            playersMoved = false;
+            counter++;
+
         }
     }
 }

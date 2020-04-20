@@ -1,11 +1,19 @@
 Você foi infectado! Você deve começar a desenvolver sintomas (tosses e/ou espirros) a qualquer momento do jogo, os demais devem lhe imitar, pois também foram infectados. O último a desenvolver os sintomas deve beber.;;1;1
 Os que estão infectados devem fazer a melhor imitação de como um vírus infecta alguém, caso contrário, bebem. Se não há ninguém infectado, o mestre bebe e ops… O copo não foi higienizado corretamente: o mestre agora pegou corona váirus!;;1;1
 Talento salva-vidas ou não: escolha uma pessoa infectada para fazer uma música explicando como se prevenir do coronavírus, se a pessoa infectada o fizer, ela agora está curada e você bebe! Se ela não o fizer, ela bebe e continua doente.;;4;2
+Talento salva-vidas ou não: escolha uma pessoa infectada para fazer uma música explicando como se prevenir do coronavírus, se a pessoa infectada o fizer, ela agora está curada e você bebe! Se ela não o fizer, ela bebe e continua doente.;;4;2
+Talento salva-vidas ou não: escolha uma pessoa infectada para fazer uma música explicando como se prevenir do coronavírus, se a pessoa infectada o fizer, ela agora está curada e você bebe! Se ela não o fizer, ela bebe e continua doente.;;4;2
+Talento salva-vidas ou não: escolha uma pessoa infectada para fazer uma música explicando como se prevenir do coronavírus, se a pessoa infectada o fizer, ela agora está curada e você bebe! Se ela não o fizer, ela bebe e continua doente.;;4;2
+Talento salva-vidas ou não: escolha uma pessoa infectada para fazer uma música explicando como se prevenir do coronavírus, se a pessoa infectada o fizer, ela agora está curada e você bebe! Se ela não o fizer, ela bebe e continua doente.;;4;2
 A próxima pessoa que tocar o rosto com essas mãos cheias de “Corona Váirus” deve beber. Não que vocês estejam morrendo de vontade agora que eu falei sobre tocar o rosto… mua-ha-ha-ha. Ah!! E o mestre agora está i n f e c t a d o…;;1;1
-A partir de você, conte todas as pessoas até parar no número abaixo, a pessoa agora sofre um reverse: se está infectada, curou-se! Se estava saudável, saiu da quarentena e foi infectada!;;5;2
 SH*T IS GETTIN’ REAL: Você agora é uma pessoa infectada, sua febre está muito alta, você está prestes a delirar, e acaba assumindo que não gosta de uma coisa sobre a pessoa a sua esquerda, essa coisa é: (conte uma coisa que você não gosta sobre essa pessoa). Caso não queira fazer, beba dois shots, mas bitch, você ainda está infectado!;;1;1
-Let the best infected win: Infectados, assim que o mestre disser já, vocês deverão correr e buscar álcool em gel, o primeiro a trazer álcool em gel para a roda curou-se! Já!;;3;2
 Oh, no! A pessoa mais velha, dentre os saudáveis, da roda desrespeitou a quarentena e, por ser grupo de risco, foi infectada. A OMS pediu pra você ficar em casa, o Átila pediu pra você ficar em casa, você foi ouvir quem não devia… Agora óh: INFECTADA!;;2;1
-A pessoa dona do celular sofre reverse: se estava infectada, agora está saudável. Se estava saudável, hm kk, CORONAH VÁIRUS!;;6;2
-SCIENCE IS MAGIC THAT WORKS: Você acabou de descobrir a cura do COVID-19, mas você só pode contar pra uma pessoa, escolha alguém para curar.;;3;2
-A pessoa infectada @pessoaInfectada agora é o coronavírus, a pessoa saudável @pessoaSaudável agora é um anticorpo, numa briga, quem ganharia? Todos votam, o ganhador escolhe um infectado para salvar, e um saudável para infectar.;;7;2
+FEZ OU NÃO FEZ?;;8;3
+FEZ OU NÃO FEZ?;;8;3
+FEZ OU NÃO FEZ?;;8;3
+FEZ OU NÃO FEZ?;;8;3
+FEZ OU NÃO FEZ?;;8;3
+FEZ OU NÃO FEZ?;;8;3
+FEZ OU NÃO FEZ?;;8;3
+FEZ OU NÃO FEZ?;;8;3
+FEZ OU NÃO FEZ?;;8;3
