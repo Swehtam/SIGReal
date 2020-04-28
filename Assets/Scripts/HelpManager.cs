@@ -53,10 +53,6 @@ public class HelpManager : MonoBehaviour
                                                               "prendas, e seja o ÚLTIMO a desistir! Assim o fazendo, você será a" +
                                                               " pessoa vencedora! Boa sorte! :D";
         }
-        else if(scene.name == "ChallengerMode")
-        {
-            gameObject.GetComponentInChildren<Text>().text = "Oopsie! Em breve teremos essa cena, aguarde na PlayStore! :D";
-        }
         StartCoroutine(FadeInHelpBox());
     }
 

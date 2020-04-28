@@ -62,3 +62,4 @@ crashlytics-build.properties
 Assets/Scenes/ChallengerMode.unity
 Assets/Scripts/EndlessTricksManager.cs
 *.txt
+*.unity
