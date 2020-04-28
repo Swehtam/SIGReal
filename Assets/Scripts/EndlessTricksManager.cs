@@ -18,7 +18,7 @@ public class EndlessTricksManager : MonoBehaviour
     //Essa variavel determina qual categoria é, essa variavel tem que ser atualizada por um script de configurações
     //0 = "Drinking Game"
     //1 = "Family Friendly"
-    //private int category = 0;
+    private int category = 0;
     private System.Random random = new System.Random();
     private readonly string textFilePath = "/TricksText/EndlessTricks.txt";
 
@@ -26,12 +26,9 @@ public class EndlessTricksManager : MonoBehaviour
     public GameObject trickBox;
     public GameObject turnBox;
 
-    public GameSettingsManager gameSettings;
-
     // Start is called before the first frame update
     void Start()
     {
-        gameSettings = FindObjectOfType<GameSettingsManager>();
         LoadTricks();
     }
 
@@ -60,7 +57,7 @@ public class EndlessTricksManager : MonoBehaviour
         {
             //Pega um numero aleatório e atualiza o texto no meio da tela
             int num = random.Next(tricks.Count);
-            trickBox.GetComponentInChildren<Text>().text = tricks[num].text[gameSettings.GetCategory()];
+            trickBox.GetComponentInChildren<Text>().text = tricks[num].text[category];
 
             //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
             backupTricks.Add(tricks[num]);
@@ -76,7 +73,7 @@ public class EndlessTricksManager : MonoBehaviour
         {
             //Pega um numero aleatório e atualiza o texto no meio da tela
             int num = random.Next(backupTricks.Count);
-            trickBox.GetComponentInChildren<Text>().text = backupTricks[num].text[gameSettings.GetCategory()];
+            trickBox.GetComponentInChildren<Text>().text = backupTricks[num].text[category];
 
             //Coloca essa prenda para a outra lista, para não repetir prendas até acabar as que estão na lista
             tricks.Add(backupTricks[num]);
