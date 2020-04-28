@@ -2280,6 +2280,7 @@ CanvasRenderer:
   m_CullTransparentMesh: 0
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 --- !u!1 &1497016704
 GameObject:
   m_ObjectHideFlags: 0
@@ -2408,6 +2409,8 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1497016704}
   m_CullTransparentMesh: 0
+=======
+>>>>>>> parent of 03a5460... Final Adjustments - Demo
 =======
 >>>>>>> parent of 03a5460... Final Adjustments - Demo
 =======
